@@ -1,9 +1,39 @@
 const { validationResult } = require('express-validator');
+const passport = require('passport');
 const User = require('../models/user.model');
 
 module.exports = {
     getLogin: async (req, res, next) => {
         res.render('login');
+    },
+
+    postLogin: async (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            req.flash('error', errors.array()[0].msg);
+            return res.redirect('/auth/login');
+        }
+        // if admin
+        if (req.body.email === process.env.ADMIN_EMAIL) {
+            passport.authenticate('local', {
+                successRedirect: '/admin/users',
+                failureRedirect: '/auth/login',
+                failureFlash: true,
+            })(req, res, next);
+        } else if (req.body.email === process.env.MODERATOR_EMAIL) {
+            passport.authenticate('local', {
+                successRedirect: '/moderator/users',
+                failureRedirect: '/auth/login',
+                failureFlash: true,
+            })(req, res, next);
+        } else {
+            passport.authenticate('local', {
+                successRedirect: '/user/profile',
+                failureRedirect: '/auth/login',
+                failureFlash: true,
+            })(req, res, next);
+        }
+
     },
 
     getRegister: async (req, res, next) => {

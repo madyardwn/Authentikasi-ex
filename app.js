@@ -8,6 +8,7 @@ const passport = require('passport');
 const connectMongo = require('connect-mongo');
 const { ensureLoggedIn } = require('connect-ensure-login');
 const { roles } = require('./middlewares/constants');
+const routes = require('./routes/index.route');
 
 require('./middlewares/passport.auth');
 require('dotenv').config();
@@ -50,8 +51,6 @@ app.use((req, res, next) => {
   res.locals.messages = req.flash();
   next();
 });
-
-const routes = require('./routes/index.route');
 
 // Routes
 app.use('/', routes.userRoute);
